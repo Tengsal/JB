@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
           <div>
             <div className="flex items-center mb-4">
               <Briefcase className="h-8 w-8 text-blue-400" />
-              <span className="ml-2 text-xl font-bold">JobPortal</span>
+              <span className="ml-2 text-xl font-bold">Zyora</span>
             </div>
             <p className="text-gray-400 mb-4">
               Connecting talented professionals with their dream careers and helping employers 
@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} JobPortal. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Zyora. All rights reserved.</p>
         </div>
       </div>
     </footer>
