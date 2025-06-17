@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+axios.defaults.baseURL = 'http://localhost:5000'; // Set your backend URL here
+
 interface User {
   _id: string;
   name: string;
@@ -35,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // Check if user is authenticated on mount
   useEffect(() => {
     const verifyToken = async () => {
       if (!token) return;
@@ -63,13 +64,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       const response = await axios.post('/api/auth/login', { email, password });
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      
+
       toast.success('Login successful!');
-      
+
       if (user.role === 'employer') {
         navigate('/dashboard/employer');
       } else {
@@ -88,13 +89,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       const response = await axios.post('/api/auth/register', { name, email, password, role });
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      
+
       toast.success('Registration successful!');
-      
+
       if (user.role === 'employer') {
         navigate('/dashboard/employer');
       } else {

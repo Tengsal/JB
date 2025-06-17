@@ -5,9 +5,10 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import jobRoutes from './routes/jobs.js';
 import userRoutes from './routes/users.js';
-import applicationRoutes from './routes/applications.js';
+  import applicationRoutes from './routes/applications.js';
 import analyticsRoutes from './routes/analytics.js';
 import textGeneratorRoutes from './routes/textGenerator.js';
+import recommender  from "./recommender.js";
 
 // Load environment variables
 dotenv.config();
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/jobportal')
+mongoose.connect(process.env.MONGO_URI || 'your-fallback-mongo-uri-here')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -32,7 +33,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/text-generator', textGeneratorRoutes);
-
+app.use('/api', recommender);
 // Basic route
 app.get('/', (req, res) => {
   res.send('Job Portal API is running');

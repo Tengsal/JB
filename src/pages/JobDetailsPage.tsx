@@ -6,6 +6,9 @@ import {
   XCircle, Share2, Bookmark, Clock, Building2, Globe, Mail
 } from 'lucide-react';
 
+// Local storage key for applications
+const LOCAL_STORAGE_KEY = 'jobApplications';
+
 // Dummy job data
 const dummyJobs = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
@@ -50,6 +53,15 @@ This is an opportunity to make a significant impact in a dynamic environment whi
   }
 }));
 
+interface Application {
+  jobId: number;
+  name: string;
+  email: string;
+  phone: string;
+  coverLetter: string;
+  timestamp: string;
+}
+
 const JobDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<any>(null);
@@ -63,9 +75,24 @@ const JobDetailsPage: React.FC = () => {
     resume: null as File | null,
     coverLetter: ''
   });
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [applicationSuccess, setApplicationSuccess] = useState(false);
 
+  // Load applications from localStorage
   useEffect(() => {
-    // Simulate API call
+    const savedApplications = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedApplications) {
+      setApplications(JSON.parse(savedApplications));
+    }
+  }, []);
+
+  // Save applications to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(applications));
+  }, [applications]);
+
+  // Load job data
+  useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       const foundJob = dummyJobs.find(job => job.id === Number(id));
@@ -76,10 +103,42 @@ const JobDetailsPage: React.FC = () => {
 
   const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if already applied
+    const hasApplied = applications.some(app => app.jobId === job.id);
+    if (hasApplied) {
+      alert('You have already applied to this position!');
+      setIsApplying(false);
+      return;
+    }
+
     // Simulate API call
     setTimeout(() => {
+      const newApplication = {
+        jobId: job.id,
+        name: applicationForm.name,
+        email: applicationForm.email,
+        phone: applicationForm.phone,
+        coverLetter: applicationForm.coverLetter,
+        timestamp: new Date().toISOString()
+      };
+      
+      setApplications(prev => [...prev, newApplication]);
+      
+      // Reset form
+      setApplicationForm({
+        name: '',
+        email: '',
+        phone: '',
+        resume: null,
+        coverLetter: ''
+      });
+      
       setIsApplying(false);
-      // Show success message or redirect
+      setApplicationSuccess(true);
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => setApplicationSuccess(false), 5000);
     }, 1000);
   };
 
@@ -93,6 +152,8 @@ const JobDetailsPage: React.FC = () => {
       setApplicationForm(prev => ({ ...prev, resume: e.target.files?.[0] || null }));
     }
   };
+
+  const hasApplied = applications.some(app => app.jobId === job?.id);
 
   if (isLoading) {
     return (
@@ -124,6 +185,13 @@ const JobDetailsPage: React.FC = () => {
 
   return (
     <div className="pt-20 min-h-screen bg-gray-50">
+      {/* Success Notification */}
+      {applicationSuccess && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          Application submitted successfully!
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Link
@@ -193,10 +261,15 @@ const JobDetailsPage: React.FC = () => {
               
               <div className="mt-6 flex flex-wrap gap-2">
                 <button
-                  onClick={() => setIsApplying(true)}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex-1 md:flex-none"
+                  onClick={() => !hasApplied && setIsApplying(true)}
+                  className={`px-5 py-2 ${
+                    hasApplied 
+                      ? 'bg-green-600 hover:bg-green-600 cursor-default' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white rounded-md transition-colors flex-1 md:flex-none`}
+                  disabled={hasApplied}
                 >
-                  Apply Now
+                  {hasApplied ? 'Applied ✓' : 'Apply Now'}
                 </button>
                 <button
                   onClick={() => setHasSaved(!hasSaved)}
@@ -392,7 +465,7 @@ const JobDetailsPage: React.FC = () => {
             <form onSubmit={handleApply} className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -405,7 +478,7 @@ const JobDetailsPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                   <input
                     type="email"
                     name="email"
@@ -430,7 +503,7 @@ const JobDetailsPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Resume</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Resume *</label>
                   <div className="border border-gray-300 rounded-md p-4">
                     <div className="flex items-center justify-center w-full">
                       <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
@@ -446,6 +519,7 @@ const JobDetailsPage: React.FC = () => {
                           className="hidden" 
                           onChange={handleFileChange}
                           accept=".pdf,.docx"
+                          required
                         />
                       </label>
                     </div>

@@ -1,0 +1,38 @@
+/* Glassmorphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Neumorphism effects */
+.neu-light {
+  border-radius: 20px;
+  background: #e0e5ec;
+  box-shadow:  8px 8px 16px #c1c6cd, 
+              -8px -8px 16px #ffffff;
+}
+
+.neu-dark {
+  border-radius: 20px;
+  background: #1a202c;
+  box-shadow:  8px 8px 16px #0d1119, 
+              -8px -8px 16px #272f3f;
+}
+
+/* Theme color variables */
+.theme-blue {
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+}
+
+.theme-emerald {
+  --primary-500: #10b981;
+  --primary-600: #059669;
+}
+
+.theme-rose {
+  --primary-500: #f43f5e;
+  --primary-600: #e11d48;
+}

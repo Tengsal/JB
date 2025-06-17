@@ -9,7 +9,7 @@ const MainLayout: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
       <motion.main 
-        className="flex-grow"
+        className="flex-grow pt-20 md:pt-24" // Added responsive padding-top
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 15 }}

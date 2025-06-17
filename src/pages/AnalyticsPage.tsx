@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  BarChart2, PieChart, TrendingUp, Users, Calendar, ArrowUp, ArrowDown, Filter, RefreshCw
+  BarChart2, TrendingUp, Users, Calendar, ArrowUp, ArrowDown, Filter, RefreshCw
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -269,13 +269,12 @@ const AnalyticsPage: React.FC = () => {
                   y: {
                     beginAtZero: true,
                     grid: {
-                      drawBorder: false,
+                      display: false
                     },
                   },
                   x: {
                     grid: {
-                      display: false,
-                      drawBorder: false,
+                      display: false
                     },
                   },
                 },
@@ -319,13 +318,12 @@ const AnalyticsPage: React.FC = () => {
                     x: {
                       beginAtZero: true,
                       grid: {
-                        drawBorder: false,
+                        display: false
                       },
                     },
                     y: {
                       grid: {
-                        display: false,
-                        drawBorder: false,
+                        display: false
                       },
                     },
                   },

@@ -1,330 +1,143 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Search, Briefcase, Building2, Users, TrendingUp, Rocket, Award, Zap, MapPin  } from 'lucide-react';
-import JobSearchBar from '../components/JobSearchBar';
+import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Trophy } from 'lucide-react';
+import UserProgress from '../components/UserProgress';
+import HeroSection from '../components/HeroSection';
+import StatsSection  from '../components/StatsSection'; // Use the defaultStats
+import TabsSection from '../components/TabsSection';
+import GamificationSection from '../components/GamificationSection';
+import CTASection from '../components/CTASection';
 
-const HomePage: React.FC = () => {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
+const JobBoard = () => {
+  const [darkMode] = useState(true);
+  const [userPoints, setUserPoints] = useState(1250);
+  const userLevel = 3;
+  const [showAchievementNotification, setShowAchievementNotification] = useState(false);
+  const [currentNotification, setCurrentNotification] = useState({ title: '', description: '' });
 
-  const stats = [
-    { icon: <Briefcase className="w-6 h-6" />, count: '10K+', label: 'Active Jobs' },
-    { icon: <Building2 className="w-6 h-6" />, count: '2.5K+', label: 'Companies' },
-    { icon: <Users className="w-6 h-6" />, count: '50K+', label: 'Job Seekers' },
-    { icon: <TrendingUp className="w-6 h-6" />, count: '98%', label: 'Success Rate' }
-  ];
+  useEffect(() => {
+    const achievementTimeout = setTimeout(() => {
+      setCurrentNotification({ title: 'Job Explorer', description: 'Viewed 5 job listings' });
+      setShowAchievementNotification(true);
+      setUserPoints(prev => prev + 50);
+      setTimeout(() => setShowAchievementNotification(false), 4000);
+    }, 3000);
+
+    return () => clearTimeout(achievementTimeout);
+  }, []);
 
   const categories = [
-    { name: 'Technology', icon: <Zap className="w-6 h-6" />, color: 'bg-purple-100' },
-    { name: 'Marketing', icon: <Rocket className="w-6 h-6" />, color: 'bg-pink-100' },
-    { name: 'Design', icon: <Award className="w-6 h-6" />, color: 'bg-blue-100' },
-    { name: 'Finance', icon: <TrendingUp className="w-6 h-6" />, color: 'bg-green-100' },
-    { name: 'Healthcare', icon: <Briefcase className="w-6 h-6" />, color: 'bg-red-100' },
-    { name: 'Education', icon: <Users className="w-6 h-6" />, color: 'bg-yellow-100' },
-    { name: 'Engineering', icon: <Building2 className="w-6 h-6" />, color: 'bg-indigo-100' },
-    { name: 'Customer Service', icon: <Search className="w-6 h-6" />, color: 'bg-orange-100' }
+    { id: '1', name: 'Technology', icon: 'Zap', color: 'bg-purple-100 text-purple-600' },
+    { id: '2', name: 'Marketing', icon: 'Rocket', color: 'bg-pink-100 text-pink-600' },
+    { id: '3', name: 'Design', icon: 'Award', color: 'bg-blue-100 text-blue-600' },
+    { id: '4', name: 'Finance', icon: 'TrendingUp', color: 'bg-green-100 text-green-600' },
+    { id: '5', name: 'Healthcare', icon: 'Briefcase', color: 'bg-red-100 text-red-600' },
+    { id: '6', name: 'Education', icon: 'Users', color: 'bg-yellow-100 text-yellow-600' },
+    { id: '7', name: 'Engineering', icon: 'Building2', color: 'bg-indigo-100 text-indigo-600' },
+    { id: '8', name: 'Customer Service', icon: 'Search', color: 'bg-orange-100 text-orange-600' },
   ];
 
+  const jobListings = [
+    {
+      id: '1',
+      title: 'Senior UX Designer',
+      company: 'TechVision',
+      location: 'Remote',
+      salary: '$90K - $120K',
+      tags: ['Figma', 'UI/UX', 'Prototyping'],
+      isNew: true,
+      isHot: true,
+    },
+    {
+      id: '2',
+      title: 'Frontend Developer',
+      company: 'WebCraft',
+      location: 'San Francisco, CA',
+      salary: '$110K - $140K',
+      tags: ['React', 'TypeScript', 'NextJS'],
+      isNew: false,
+      isHot: true,
+    },
+    {
+      id: '3',
+      title: 'Data Scientist',
+      company: 'DataMinds',
+      location: 'New York, NY',
+      salary: '$120K - $150K',
+      tags: ['Python', 'ML', 'TensorFlow'],
+      isNew: true,
+      isHot: false,
+    },
+    {
+      id: '4',
+      title: 'Product Manager',
+      company: 'ProductLabs',
+      location: 'Austin, TX',
+      salary: '$100K - $130K',
+      tags: ['Agile', 'Scrum', 'Product Strategy'],
+      isNew: false,
+      isHot: false,
+    },
+  ];
+
+  const achievementsData = [
+    { id: 1, title: 'First Application', description: 'You successfully submitted your first job application!', points: 50, earned: true },
+    { id: 2, title: 'Profile Completer', description: 'Your profile is now 100% complete. Well done!', points: 100, earned: true },
+    { id: 3, title: 'Job Explorer', description: 'You have viewed 5 job listings. Keep exploring!', points: 50, earned: true },
+    { id: 4, title: 'Interview Ace', description: 'Ace that interview and this badge is yours!', points: 200, earned: false },
+    { id: 5, title: 'Top Candidate', description: 'Become a top candidate to unlock this achievement.', points: 300, earned: false },
+  ];
+
+  const applyForJob = () => {
+    setUserPoints(prev => prev + 25);
+    setCurrentNotification({ title: 'First Application', description: 'Applied for your first job!' });
+    setShowAchievementNotification(true);
+    setTimeout(() => setShowAchievementNotification(false), 4000);
+  };
+
   return (
-    <div className="pt-16">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
-        <div className="absolute inset-0 opacity-15 bg-[url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center" />
-        <div className="container mx-auto px-4 py-24 md:py-32 relative">
-          <motion.div 
-            className="max-w-4xl mx-auto text-center"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { 
-                opacity: 1,
-                transition: { staggerChildren: 0.2 }
-              }
-            }}
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <AnimatePresence>
+        {showAchievementNotification && (
+          <motion.div
+            key="achievement-notification"
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -50, x: '-50%', transition: { duration: 0.3 } }}
+            className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-xl z-50 w-auto max-w-md
+                        ${darkMode ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-gray-200'}`}
           >
-            <motion.h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
-              variants={fadeIn}
-            >
-              Launch Your <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">Career</span> Journey
-            </motion.h1>
-            <motion.p 
-              className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed"
-              variants={fadeIn}
-            >
-              Transform your career path with AI-powered job matching and personalized opportunities
-            </motion.p>
-            
-            <motion.div
-              variants={fadeIn}
-              className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-2xl"
-            >
-              <JobSearchBar />
-            </motion.div>
-
-            <motion.div 
-              className="mt-8 flex flex-wrap justify-center gap-4"
-              variants={fadeIn}
-            >
-              <Link 
-                to="/jobs" 
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-semibold transition-all shadow-lg hover:shadow-indigo-500/30 flex items-center gap-2"
-              >
-                <Briefcase className="w-5 h-5" />
-                Explore Opportunities
-              </Link>
-              <Link 
-                to="/register" 
-                className="px-8 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-semibold transition-all shadow-lg hover:shadow-white/10 flex items-center gap-2"
-              >
-                <Rocket className="w-5 h-5" />
-                Get Started Free
-              </Link>
-            </motion.div>
+            <div className="flex items-center">
+              <Trophy className={`w-6 h-6 mr-3 flex-shrink-0 ${darkMode ? 'text-yellow-400' : 'text-yellow-500'}`} />
+              <div>
+                <h3 className="font-bold text-lg">{currentNotification.title}</h3>
+                {currentNotification.description && <p className="text-sm">{currentNotification.description}</p>}
+              </div>
+            </div>
           </motion.div>
-        </div>
-      </section>
+        )}
+      </AnimatePresence>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-blue-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all border border-gray-100"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeIn}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div className="flex justify-center text-indigo-600 mb-4">
-                  {stat.icon}
-                </div>
-                <h3 className="text-4xl font-bold text-gray-900 mb-2">{stat.count}</h3>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <main className="container mx-auto px-4 py-8">
+        <UserProgress darkMode={darkMode} userLevel={userLevel} userPoints={userPoints} />
 
-      {/* Featured Jobs Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <motion.h2 
-              className="text-3xl font-bold text-gray-900 mb-4"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-            >
-              Featured Opportunities
-            </motion.h2>
-            <motion.p 
-              className="text-gray-600 text-lg max-w-2xl mx-auto"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              variants={fadeIn}
-            >
-              Discover hand-picked positions from innovative companies
-            </motion.p>
-          </div>
+        <HeroSection />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <motion.div
-                key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group border border-gray-100"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                variants={fadeIn}
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className={`p-3 rounded-xl ${['bg-purple-100', 'bg-blue-100', 'bg-pink-100'][index % 3]}`}>
-                      <Briefcase className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <span className="px-4 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm font-medium">
-                      {['Full-time', 'Remote', 'Hybrid', 'Contract'][index % 4]}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {[
-                      'Senior Software Engineer', 
-                      'UX/UI Designer', 
-                      'Marketing Director', 
-                      'Product Manager',
-                      'Data Scientist',
-                      'Financial Analyst'
-                    ][index % 6]}
-                  </h3>
-                  <div className="mb-6">
-                    <p className="text-gray-600 font-medium">
-                      {['TechSphere', 'DesignHub', 'MarketGenius', 'ProductIQ', 'DataMinds', 'FinanceElite'][index % 6]}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2 flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {['San Francisco', 'Remote', 'New York', 'London', 'Berlin', 'Tokyo'][index % 6]}
-                    </p>
-                  </div>
-                  <div className="mb-6">
-                    <p className="text-indigo-600 font-bold text-lg">
-                      ${['120K', '95K', '85K', '110K', '130K', '90K'][index % 6]} - 
-                      ${['150K', '120K', '100K', '130K', '160K', '110K'][index % 6]}
-                      <span className="text-gray-500 text-sm font-normal"> / year</span>
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {['React', 'Node.js', 'TypeScript', 'UI/UX', 'Marketing', 'Finance'].slice(0, 3).map((tag, i) => (
-                      <span key={i} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <Link
-                    to={`/jobs/${index + 1}`}
-                    className="block w-full text-center py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors font-medium shadow-sm hover:shadow-indigo-500/30"
-                  >
-                    Explore Position
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <StatsSection darkMode={darkMode}  />  {/* Use defaultStats here */}
 
-          <motion.div 
-            className="mt-12 text-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-          >
-            <Link
-              to="/jobs"
-              className="inline-flex items-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/30 transition-all"
-            >
-              <Search className="mr-2 w-5 h-5" />
-              View All Opportunities
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+        <TabsSection
+          darkMode={darkMode}
+          jobListings={jobListings}
+          categories={categories}
+          achievements={achievementsData}
+          applyForJob={applyForJob}
+        />
+      </main>
 
-      {/* Job Categories */}
-      <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <motion.h2 
-              className="text-3xl font-bold text-gray-900 mb-4"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-            >
-              Explore Career Paths
-            </motion.h2>
-            <motion.p 
-              className="text-gray-600 text-lg max-w-2xl mx-auto"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              variants={fadeIn}
-            >
-              Discover opportunities across diverse industries and specialties
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
-              <motion.div
-                key={index}
-                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer group border border-gray-100"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                variants={fadeIn}
-                whileHover={{ y: -5 }}
-              >
-                <div className={`${category.color} p-3 rounded-xl w-max mb-4`}>
-                  {category.icon}
-                </div>
-                <h3 className="font-bold text-gray-900 text-lg group-hover:text-indigo-600 transition-colors">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-gray-500 mt-2">
-                  {['Tech', 'Creative', 'Business', 'Finance', 'Health', 'Education', 'Engineering', 'Service'][index]} Roles
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative py-24 bg-gradient-to-br from-indigo-900 to-blue-900 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center" />
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.h2 
-              className="text-3xl font-bold mb-6"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-            >
-              Ready for Career Transformation?
-            </motion.h2>
-            <motion.p 
-              className="text-blue-200 text-lg mb-8 leading-relaxed"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              variants={fadeIn}
-            >
-              Join our community of professionals and unlock your potential with personalized career solutions
-            </motion.p>
-            <motion.div
-              className="flex flex-col sm:flex-row justify-center gap-6"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              variants={fadeIn}
-            >
-              <Link
-                to="/register"
-                className="px-8 py-4 bg-white text-indigo-600 hover:bg-indigo-50 rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all flex items-center gap-2"
-              >
-                <Rocket className="w-5 h-5" />
-                Start Free Trial
-              </Link>
-              <Link
-                to="/jobs"
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all flex items-center gap-2"
-              >
-                <Search className="w-5 h-5" />
-                Browse Jobs
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <GamificationSection darkMode={darkMode} />
+      <CTASection />
     </div>
   );
 };
 
-export default HomePage;
+export default JobBoard;

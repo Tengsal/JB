@@ -97,7 +97,7 @@ const TextGeneratorPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">AI Text Generator</h1>
+          <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">AI Content Assistant</h1>
           <p className="text-center text-gray-600 mb-8">
             Create professional content for your job search with our AI-powered text generator
           </p>
@@ -237,8 +237,10 @@ const TextGeneratorPage: React.FC = () => {
 };
 
 // Helper functions to generate sample text (in a real app, these would call an AI API)
-const generateResume = (prompt: string) => {
-  return `# PROFESSIONAL RESUME
+ const generateResume = (prompt: string) => {
+    return `# PROFESSIONAL RESUME
+    ## BASED ON YOUR INPUT:
+${prompt}
 
 ## SUMMARY
 Experienced software engineer with a proven track record in developing robust applications using modern web technologies. Skilled in React, Node.js, and TypeScript with a focus on creating scalable, user-friendly solutions.

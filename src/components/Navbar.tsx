@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Rocket, Menu, X, User, LogIn, UserPlus  // Updated icon import
+  Rocket, Menu, X, User, LogIn, UserPlus, Search, MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const searchRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -22,11 +27,32 @@ const Navbar: React.FC = () => {
     setIsMenuOpen(false);
   }, [location]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/jobs', label: 'Find Jobs' },
-    { path: '/text-generator', label: 'Resume Builder' },
+    { path: '/text-generator', label: 'Content Generator' },
   ];
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchKeyword.trim() || searchLocation.trim()) {
+      navigate(`/jobs?keyword=${encodeURIComponent(searchKeyword)}&location=${encodeURIComponent(searchLocation)}`);
+      setIsSearchExpanded(false);
+    }
+  };
 
   return (
     <motion.header
@@ -39,7 +65,6 @@ const Navbar: React.FC = () => {
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between">
-          {/* Updated Logo with Rocket Icon */}
           <Link 
             to="/" 
             className="flex items-center group relative"
@@ -95,6 +120,92 @@ const Navbar: React.FC = () => {
             ))}
           </nav>
 
+          {/* Search Bar */}
+          <div 
+            ref={searchRef}
+            className={`${
+              isSearchExpanded 
+                ? 'absolute left-0 top-0 w-full bg-white shadow-lg py-4 px-4 z-50' 
+                : 'relative'
+            }`}
+          >
+            <form 
+              onSubmit={handleSearchSubmit}
+              className={`flex flex-col md:flex-row gap-2 w-full ${
+                isSearchExpanded ? 'max-w-6xl mx-auto' : 'md:w-64'
+              }`}
+            >
+              {isSearchExpanded && (
+                <button
+                  type="button"
+                  onClick={() => setIsSearchExpanded(false)}
+                  className="md:hidden absolute top-6 left-4 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+              
+              <div className={`relative group flex-1 ${
+                isSearchExpanded ? '' : 'hidden md:block'
+              }`}>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder="Job title or keywords"
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg border focus:ring-2 outline-none text-sm
+                    ${isSearchExpanded 
+                      ? 'bg-white border-gray-300 focus:border-indigo-500 focus:ring-indigo-100' 
+                      : 'bg-gray-100 border-transparent hover:bg-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-indigo-100'}`}
+                />
+              </div>
+              
+              <div className={`relative group flex-1 ${
+                isSearchExpanded ? '' : 'hidden md:block'
+              }`}>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  placeholder="Location or remote"
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg border focus:ring-2 outline-none text-sm
+                    ${isSearchExpanded 
+                      ? 'bg-white border-gray-300 focus:border-indigo-500 focus:ring-indigo-100' 
+                      : 'bg-gray-100 border-transparent hover:bg-gray-200 focus:bg-white focus:border-indigo-500 focus:ring-indigo-100'}`}
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className={`py-2.5 px-4 font-medium rounded-lg whitespace-nowrap flex items-center justify-center gap-2 ${
+                  isSearchExpanded 
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                    : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hidden md:flex'
+                }`}
+              >
+                <Search className="h-4 w-4" />
+                <span className={`${isSearchExpanded ? 'block' : 'hidden lg:block'}`}>
+                  Search
+                </span>
+              </button>
+            </form>
+          </div>
+
+          {/* Mobile Search Toggle */}
+          <button
+            onClick={() => setIsSearchExpanded(true)}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
+            aria-label="Open search"
+          >
+            <Search className="h-5 w-5 text-gray-700" />
+          </button>
+
           {/* Auth Section */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
@@ -137,6 +248,7 @@ const Navbar: React.FC = () => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? (
               <X className="h-6 w-6 text-gray-700" />
@@ -150,62 +262,108 @@ const Navbar: React.FC = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden mt-4 bg-white rounded-xl shadow-lg border border-gray-100"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden overflow-hidden"
             >
-              <div className="flex flex-col p-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`px-4 py-3 rounded-lg ${
-                      location.pathname === link.path 
-                        ? 'bg-indigo-50 text-indigo-600 font-medium' 
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              <div className="mt-4 bg-white rounded-xl shadow-lg border border-gray-100">
+                {/* Search in mobile menu */}
+                <div className="p-4 border-b border-gray-100">
+                  <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        placeholder="Job title or keywords"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-sm"
+                      />
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MapPin className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        value={searchLocation}
+                        onChange={(e) => setSearchLocation(e.target.value)}
+                        placeholder="Location or remote"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-sm"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="py-2.5 px-4 font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center justify-center gap-2"
+                    >
+                      <Search className="h-4 w-4" />
+                      Search Jobs
+                    </button>
+                  </form>
+                </div>
                 
-                <div className="border-t border-gray-100 mt-2 pt-2">
-                  {user ? (
-                    <>
-                      <Link
-                        to={`/dashboard/${user.role}`}
-                        className="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-                      >
-                        <User className="h-5 w-5 mr-3" />
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        className="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-                      >
-                        <LogIn className="h-5 w-5 mr-3" />
-                        Login
-                      </Link>
-                      <Link
-                        to="/register"
-                        className="flex items-center px-4 py-3 mt-2 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700"
-                      >
-                        <UserPlus className="h-5 w-5 mr-3 text-white/90" />
-                        Get Started
-                      </Link>
-                    </>
-                  )}
+                <div className="flex flex-col py-2">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-5 py-3 flex items-center ${
+                        location.pathname === link.path 
+                          ? 'bg-indigo-50 text-indigo-600 font-medium' 
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {link.label}
+                      {location.pathname === link.path && (
+                        <motion.div 
+                          className="ml-auto w-2 h-2 rounded-full bg-indigo-600"
+                          layoutId="mobile-nav-indicator"
+                        />
+                      )}
+                    </Link>
+                  ))}
+                  
+                  <div className="border-t border-gray-100 mt-1 pt-2 px-2">
+                    {user ? (
+                      <>
+                        <Link
+                          to={`/dashboard/${user.role}`}
+                          className="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                        >
+                          <User className="h-5 w-5 mr-3" />
+                          Dashboard
+                        </Link>
+                        <button
+                          onClick={logout}
+                          className="w-full flex items-center px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
+                        >
+                          <X className="h-5 w-5 mr-3" />
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/login"
+                          className="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
+                        >
+                          <LogIn className="h-5 w-5 mr-3" />
+                          Login
+                        </Link>
+                        <Link
+                          to="/register"
+                          className="flex items-center justify-center px-4 py-3 mt-2 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700"
+                        >
+                          <UserPlus className="h-5 w-5 mr-2 text-white/90" />
+                          Get Started
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </motion.div>
